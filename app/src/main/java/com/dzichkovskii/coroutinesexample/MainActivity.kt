@@ -11,6 +11,7 @@ import kotlinx.coroutines.Dispatchers.Main
 class MainActivity : AppCompatActivity() {
 
     private val RESULT_1 = "Result #1"
+    private val RESULT_2 = "Result #2"
     private var counter = 1
     private lateinit var tvCoroutines: TextView
 
@@ -37,7 +38,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setNewText1(input: Int){
-        tv_coroutines_pause_example2.text = "Job #" + input.toString()
+        tv_coroutines_pause_example2.text = "Job #$input"
     }
 
     private suspend fun setTextOnMainThread(input: String){
@@ -56,6 +57,9 @@ class MainActivity : AppCompatActivity() {
         val result1 = getResult1fromApi()
         println("debug: $result1")
         setTextOnMainThread(result1)
+
+        val result2 = getResult2fromApi(result1)
+        setTextOnMainThread(result2)
     }
 
     private suspend fun getResult1fromApi():String {
@@ -65,6 +69,13 @@ class MainActivity : AppCompatActivity() {
         counter++
 
         return RESULT_1
+    }
+    private suspend fun getResult2fromApi(result1: String):String {
+        logThread("getResult2fromApi()")
+        delay(1000)
+        println("$result1 processed")
+        
+        return RESULT_2
     }
 
     private fun logThread(methodName: String) {
