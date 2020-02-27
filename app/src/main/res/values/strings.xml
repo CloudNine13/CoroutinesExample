@@ -2,4 +2,6 @@
     <string name="app_name">CoroutinesExample</string>
     <string name="click_me">Click me</string>
     <string name="start_job">Start job #1</string>
+    <string name="start">Start job #%1$d</string>
+    <string name="cancel">Cancel job #%1$d</string>
 </resources>

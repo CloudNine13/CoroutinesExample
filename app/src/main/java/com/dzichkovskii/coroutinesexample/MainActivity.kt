@@ -3,7 +3,6 @@ package com.dzichkovskii.coroutinesexample
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ProgressBar
-import android.widget.TextView
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
@@ -12,12 +11,14 @@ import kotlinx.coroutines.Dispatchers.Main
 
 class MainActivity : AppCompatActivity() {
 
-    private val PROGRESS_MAX = 100
-    private val PROGRESS_START = 0
-    private val JOB_TIME = 4000 //ms
+    companion object {
+        private const val PROGRESS_MAX = 100
+        private const val PROGRESS_START = 0
+        private const val JOB_TIME = 4000 //ms
+    }
+
     private lateinit var job: CompletableJob
     private var counter = 0
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,11 +33,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initJob(){
-        job_button.text = "Start Job #${counter + 1}"
+        job_button.text = getString(R.string.start, counter + 1)
         counter++
         updateJobCompleteTextView("" )
         job = Job()
-        job.invokeOnCompletion {
+        job.invokeOnCompletion { it ->
             it?.message.let{
                 var msg = it
                 if(msg.isNullOrBlank()) {
@@ -56,9 +57,9 @@ class MainActivity : AppCompatActivity() {
             resetJob()
         }
         else {
-            job_button.text = "Cancel job #$counter"
+            job_button.text = getString(R.string.cancel, counter)
             CoroutineScope(IO + job).launch {
-                println("coroutine $this is activated wit job $job")
+                println("coroutine $this is activated with job $job")
 
                 for (i in PROGRESS_START .. PROGRESS_MAX){
                     delay((JOB_TIME/PROGRESS_MAX).toLong())
@@ -76,10 +77,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun resetJob() {
-        if(job.isActive || job.isCompleted){
+        if(job.isCompleted){
             job.cancel(CancellationException("Resetting Job"))
+            initJob()
+        } else if (job.isActive) {
+            job.cancel(CancellationException("Resetting Job"))
+            initJob()
+            updateJobCompleteTextView("Job#${counter-1} was cancelled")
         }
-        initJob()
     }
 
     private fun showToast(text: String) {
